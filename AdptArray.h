@@ -1,20 +1,17 @@
-#include "AdptArray.c"
+#ifndef ADAPTARRAY_H
+#define ADAPTARRAY_H
+typedef struct AdptArray_* PAdptArray;
+typedef enum  {FAIL = 0, SUCCESS=1} Result;
+typedef void* PElement;
 
-/*
-This struct creates a generic element to be later on assigned to our adptarray
-*/
+typedef void(*DEL_FUNC)(PElement);
+typedef PElement(*COPY_FUNC)(PElement);
+typedef void(*PRINT_FUNC)(PElement);
 
-typedef struct Element
-{
-    void* data;
-}Element, Pelement*;
-
-typedef struct AdptArray
-{
-    int ArraySize;
-    Element* Pelem;
-    DEL_FUNC delFunc;
-	COPY_FUNC copyFunc;
-
-}AdptArray, PAdptArray*;
-
+PAdptArray CreateAdptArray(COPY_FUNC, DEL_FUNC,PRINT_FUNC);
+void DeleteAdptArray(PAdptArray);
+Result SetAdptArrayAt(PAdptArray, int, PElement);
+PElement GetAdptArrayAt(PAdptArray, int);
+int GetAdptArraySize(PAdptArray);
+void PrintDB(PAdptArray);
+#endif
