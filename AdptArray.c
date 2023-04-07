@@ -7,44 +7,48 @@
 typedef struct Element
 {
     void* data;
-}Element, Pelement*;
+}Element, *Pelement;
 
 typedef struct AdptArray
 {
     int ArraySize;
-    Element* Pelem;
+    PElement* Pelem;
     DEL_FUNC delFunc;
 	COPY_FUNC copyFunc;
     PRINT_FUNC printFunc;
 
-}AdptArray, PAdptArray*;
+}AdptArray, *PAdptArray;
 
 PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc, PRINT_FUNC printi){
     PAdptArray NewArray = (PAdptArray)malloc(sizeof(AdptArray));
     if (!NewArray)
         return NewArray;
-    NewArray.ArraySize = 0;
-    NewArray.Pelem = NULL;
-    NewArray.delFunc = DelFunc;
-    NewArray.copyFunc = CopyFunc; 
-    NewArray.printFunc = printi;
+    NewArray->ArraySize = 0;
+    NewArray->Pelem = NULL;
+    NewArray->delFunc = DelFunc;
+    NewArray->copyFunc = CopyFunc; 
+    NewArray->printFunc = printi;
     return NewArray;
 }
 
 void DeleteAdptArray(PAdptArray PArr){
     int i=0;
     if (PArr == NULL)
-    {
         return;
-    }
-    for(i, i< PArr->ArrSize, i++){
-        if (!PArr){
+    
+    for(i; i< PArr->ArraySize; i++){
+        if (!PArr)
             return;
-        }
         PArr->delFunc((PArr->Pelem)[i]);
     }
     free(PArr->Pelem);
     free(PArr);
+}
+
+int GetAdptArraySize(PAdptArray PArr){
+    if (!PArr)
+        return FAIL;
+    return PArr->ArraySize;
 }
 
 Result SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
@@ -52,31 +56,31 @@ Result SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
         return FAIL;
     Pelement* newElem;
     
-    if (ndx >= PArr.ArraySize){
-        newElem = (Pelem*)calloc((ndx+1), sizeof(Pelement));
+    if (ndx >= PArr->ArraySize){
+        newElem = (Pelement*)calloc((ndx+1), sizeof(Pelement));
         if (!newElem)
             return FAIL;
-        memcpy(newElem, PArr.Pelem, (PArr.ArraySize)*sizeof(Pelement));
-        free(PArr.Pelem);
+        memcpy(newElem, PArr->Pelem, (PArr->ArraySize)*sizeof(Pelement));
+        free(PArr->Pelem);
 		PArr->Pelem = newElem;
     }
-    PArr.ArraySize = (ndx >= PArr.ArraySize) ? (ndx + 1) : PArr.ArraySize;
+    PArr->ArraySize = (ndx >= PArr->ArraySize) ? (ndx + 1) : PArr->ArraySize;
     return SUCCESS;
 }
 
 PElement GetAdptArrayAt(PAdptArray PArr, int ndx){
     if (PArr == NULL)
         return FAIL;
-    if (ndx >= PArr.ArraySize)
+    if (ndx >= PArr->ArraySize)
         return FAIL;
-    PElement temp = (PArr.Pelem)[ndx];
+    PElement temp = (PArr->Pelem)[ndx];
     return temp;
 }
 
 void PrintDB(PAdptArray PArr){
     if (PArr==NULL)
         return;
-    for (int i=0; i<PArr.ArraySize; i++)
-        if ((PArr.Pelem)[i])
-            PArr.printFunc((PArr.Pelem)[i]);
+    for (int i=0; i<PArr->ArraySize; i++)
+        if ((PArr->Pelem)[i])
+            PArr->printFunc((PArr->Pelem)[i]);
 }
