@@ -1,15 +1,12 @@
 #include "AdptArray.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 #define FAIL -1
 #define SUCCESS 1
 
-typedef struct Element
-{
-    void* data;
-}Element, *Pelement;
-
-typedef struct AdptArray
+typedef struct AdptArray_
 {
     int ArraySize;
     PElement* Pelem;
@@ -32,11 +29,10 @@ PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc, PRINT_FUNC prin
 }
 
 void DeleteAdptArray(PAdptArray PArr){
-    int i=0;
     if (PArr == NULL)
         return;
     
-    for(i; i< PArr->ArraySize; i++){
+    for(int i=0; i< (PArr->ArraySize); i++){
         if (!PArr)
             return;
         PArr->delFunc((PArr->Pelem)[i]);
@@ -51,16 +47,16 @@ int GetAdptArraySize(PAdptArray PArr){
     return PArr->ArraySize;
 }
 
-Result SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
+Result SetAdptArray(PAdptArray PArr, int ndx, PElement Pelem){
     if (!PArr)
         return FAIL;
-    Pelement* newElem;
+    PElement* newElem;
     
     if (ndx >= PArr->ArraySize){
-        newElem = (Pelement*)calloc((ndx+1), sizeof(Pelement));
+        newElem = (PElement*)calloc((ndx+1), sizeof(PElement));
         if (!newElem)
             return FAIL;
-        memcpy(newElem, PArr->Pelem, (PArr->ArraySize)*sizeof(Pelement));
+        memcpy(newElem, PArr->Pelem, (PArr->ArraySize)*sizeof(PElement));
         free(PArr->Pelem);
 		PArr->Pelem = newElem;
     }
