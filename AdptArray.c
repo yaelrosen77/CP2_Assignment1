@@ -15,17 +15,19 @@ typedef struct AdptArray
     Element* Pelem;
     DEL_FUNC delFunc;
 	COPY_FUNC copyFunc;
+    PRINT_FUNC printFunc;
 
 }AdptArray, PAdptArray*;
 
-PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc){
+PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc, PRINT_FUNC printi){
     PAdptArray NewArray = (PAdptArray)malloc(sizeof(AdptArray));
     if (!NewArray)
         return NewArray;
-    NewArray-> ArraySize = 0;
-    NewArray-> Pelem = Null;
-    NewArray-> delFunc = DelFunc;
-    NewArray-> copyFunc = CopyFunc; 
+    NewArray.ArraySize = 0;
+    NewArray.Pelem = NULL;
+    NewArray.delFunc = DelFunc;
+    NewArray.copyFunc = CopyFunc; 
+    NewArray.printFunc = printi;
     return NewArray;
 }
 
@@ -45,7 +47,7 @@ void DeleteAdptArray(PAdptArray PArr){
     free(PArr);
 }
 
-int SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
+Result SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
     if (!PArr)
         return FAIL;
     Pelement* newElem;
@@ -54,11 +56,27 @@ int SetAdptArray(PAdptArray PArr, int ndx, Pelement Pelem){
         newElem = (Pelem*)calloc((ndx+1), sizeof(Pelement));
         if (!newElem)
             return FAIL;
-        memcpy(newElem, PArr->Pelem, (PArr->ArraySize)*sizeof(Pelement));
-        free(PArr->Pelem);
+        memcpy(newElem, PArr.Pelem, (PArr.ArraySize)*sizeof(Pelement));
+        free(PArr.Pelem);
 		PArr->Pelem = newElem;
     }
-    PArr->ArraySize = (idx >= pArr->ArrSize) ? (idx + 1) : pArr->ArrSize;
-    return 1;
+    PArr.ArraySize = (ndx >= PArr.ArraySize) ? (ndx + 1) : PArr.ArraySize;
+    return SUCCESS;
+}
 
+PElement GetAdptArrayAt(PAdptArray PArr, int ndx){
+    if (PArr == NULL)
+        return FAIL;
+    if (ndx >= PArr.ArraySize)
+        return FAIL;
+    PElement temp = (PArr.Pelem)[ndx];
+    return temp;
+}
+
+void PrintDB(PAdptArray PArr){
+    if (PArr==NULL)
+        return;
+    for (int i=0; i<PArr.ArraySize; i++)
+        if ((PArr.Pelem)[i])
+            PArr.printFunc((PArr.Pelem)[i]);
 }
