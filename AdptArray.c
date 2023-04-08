@@ -19,7 +19,7 @@ typedef struct AdptArray_
 PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc, PRINT_FUNC printi){
     PAdptArray NewArray = (PAdptArray)malloc(sizeof(AdptArray));
     if (!NewArray)
-        return NewArray;
+        return NULL;
     NewArray->ArraySize = 0;
     NewArray->Pelem = NULL;
     NewArray->delFunc = DelFunc;
@@ -31,11 +31,10 @@ PAdptArray CreateAdptArray(COPY_FUNC CopyFunc, DEL_FUNC DelFunc, PRINT_FUNC prin
 void DeleteAdptArray(PAdptArray PArr){
     if (PArr == NULL)
         return;
-    
-    for(int i=0; i< (PArr->ArraySize); i++){
-        if (!PArr)
-            return;
-        PArr->delFunc((PArr->Pelem)[i]);
+    int len = PArr->ArraySize;
+    for(int i=0; i<len; i++){
+        if ((PArr->Pelem)[i]!=NULL)
+            PArr->delFunc((PArr->Pelem)[i]);
     }
     free(PArr->Pelem);
     free(PArr);
@@ -47,7 +46,7 @@ int GetAdptArraySize(PAdptArray PArr){
     return PArr->ArraySize;
 }
 
-Result SetAdptArray(PAdptArray PArr, int ndx, PElement Pelem){
+Result SetAdptArrayAt(PAdptArray PArr, int ndx, PElement PElem){
     if (!PArr)
         return FAIL;
     PElement* newElem;
@@ -60,17 +59,29 @@ Result SetAdptArray(PAdptArray PArr, int ndx, PElement Pelem){
         free(PArr->Pelem);
 		PArr->Pelem = newElem;
     }
+
+    if((PArr->Pelem)[ndx]!=NULL){
+	    PArr->delFunc((PArr->Pelem)[ndx]);
+        (PArr->Pelem)[ndx] = PArr->copyFunc(PElem);
+    }
+    else{
+        (PArr->Pelem)[ndx] = PArr->copyFunc(PElem);
+    }
     PArr->ArraySize = (ndx >= PArr->ArraySize) ? (ndx + 1) : PArr->ArraySize;
+    
     return SUCCESS;
 }
 
 PElement GetAdptArrayAt(PAdptArray PArr, int ndx){
     if (PArr == NULL)
-        return FAIL;
-    if (ndx >= PArr->ArraySize)
-        return FAIL;
-    PElement temp = (PArr->Pelem)[ndx];
-    return temp;
+        return NULL;
+    if (ndx >= (PArr->ArraySize))
+        return NULL;
+    if ((PArr->Pelem)[ndx]==NULL)
+        return NULL;
+    else {PElement temp = PArr->copyFunc((PArr->Pelem)[ndx]);
+        return temp;}
+    return NULL;
 }
 
 void PrintDB(PAdptArray PArr){
